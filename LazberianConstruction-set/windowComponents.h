@@ -23,6 +23,7 @@ private:
 	void CreateMenuBar();
 	void CreateStatusBarInfo();
 	void CreateLayout();
+	void CreateAcelerators();
 
 	wxTreeCtrl* CreateNavigationTree(wxWindow* parent);
 	wxNotebook* CreateEditorNotebook(wxWindow* parent);
@@ -33,9 +34,11 @@ private:
 	void OnOpenFile(wxCommandEvent& event);
 	void OnExit(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
+	void OnToggleConsole(wxCommandEvent& event);
 
 	enum {
 		ID_OpenFile = wxID_HIGHEST + 1,
+		ID_ToggleConsole,
 	};
 
 };

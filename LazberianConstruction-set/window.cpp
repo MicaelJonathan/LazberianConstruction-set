@@ -5,7 +5,6 @@
 bool App::OnInit() {
 	MainFrame* frame = new MainFrame();
 	frame->Show();
-	std::cout << "Main frame initialized." << std::endl;
 	return true;
 }
 

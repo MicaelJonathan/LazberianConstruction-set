@@ -1,13 +1,17 @@
 #include "windowComponents.h"
+#include "DebugConsole.h"
+#include <iostream>
 
-MainFrame::MainFrame() : wxFrame(nullptr, wxID_ANY, "Lazberian Construction Set - Release 1", wxDefaultPosition, wxSize(1000, 650)) {
+MainFrame::MainFrame() : wxFrame(nullptr, wxID_ANY, "Lazberian Construction Set - UnitData & Items", wxDefaultPosition, wxSize(1000, 650)) {
 	CreateMenuBar();
 	CreateStatusBarInfo();
 	CreateLayout();
+	CreateAcelerators();
 
 	Bind(wxEVT_MENU, &MainFrame::OnOpenFile, this, ID_OpenFile);
 	Bind(wxEVT_MENU, &MainFrame::OnExit, this, wxID_EXIT);
 	Bind(wxEVT_MENU, &MainFrame::OnAbout, this, wxID_ABOUT);
+	Bind(wxEVT_MENU, &MainFrame::OnToggleConsole, this, ID_ToggleConsole);
 
 	Center();
 }
@@ -18,11 +22,15 @@ void MainFrame::CreateMenuBar() {
 	menuFile->AppendSeparator();
 	menuFile->Append(wxID_EXIT);
 
+	wxMenu* menuView = new wxMenu();
+	menuView->Append(ID_ToggleConsole, "Toggle Debug &Console\tF7", "Show or hide debug console");
+
 	wxMenu* menuHelp = new wxMenu();
 	menuHelp->Append(wxID_ABOUT, "&About\tF1", "About this editor");
 
 	wxMenuBar* menuBar = new wxMenuBar();
 	menuBar->Append(menuFile, "&File");
+	menuBar->Append(menuView, "&View");
 	menuBar->Append(menuHelp, "&Help");
 	SetMenuBar(menuBar);
 }
@@ -31,6 +39,13 @@ void MainFrame::CreateStatusBarInfo() {
 	CreateStatusBar(2);
 	SetStatusText("File status");
 	SetStatusText("No data loaded", 1);
+}
+
+void MainFrame::CreateAcelerators() {
+	wxAcceleratorEntry entries[1];
+	entries[0].Set(wxACCEL_NORMAL, WXK_F7, ID_ToggleConsole);
+	wxAcceleratorTable accel(1, entries);
+	SetAcceleratorTable(accel);
 }
 
 void MainFrame::CreateLayout() {
@@ -119,6 +134,19 @@ void MainFrame::OnExit(wxCommandEvent& WXUNUSED(event)) {
 }
 
 void MainFrame::OnAbout(wxCommandEvent& WXUNUSED(event)) {
-	wxMessageBox("Lazberian Construction Set - Release 1 \nJohanMikes (Programmer) \nLordLouie (Tester and Research) \nLightgazer (Special Thanks) \nVersion 1.0 (2026)",
+	wxMessageBox("Lazberian Construction Set - UnitData & Items \nJohanMikes (Main Programmer) \nLordLouie (Tester and Research) \nLightgazer (Special Thanks) \nVersion 1.0 (XX/YY/2026)",
 		"About", wxOK | wxICON_INFORMATION, this);
+}
+
+void MainFrame::OnToggleConsole(wxCommandEvent& WXUNUSED(event)) {
+	if (IsDebugConsoleOpen()) {
+		CloseDebugConsole();
+		SetStatusText("Debug console closed");
+	}
+	else {
+		OpenDebugConsole();
+		std::cout << "Debug console opened." << std::endl;
+		std::cout << "WARNING!! Closing this console will close the application, if you still have unsaved data, save it before closing." << std::endl;
+		SetStatusText("Debug console opened");
+	}
 }
