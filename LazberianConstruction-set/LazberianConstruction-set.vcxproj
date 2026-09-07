@@ -19,10 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DebugConsole.h" />
     <ClInclude Include="window.h" />
     <ClInclude Include="windowComponents.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DebugConsole.cpp" />
     <ClCompile Include="window.cpp" />
     <ClCompile Include="windowComponents.cpp" />
   </ItemGroup>
