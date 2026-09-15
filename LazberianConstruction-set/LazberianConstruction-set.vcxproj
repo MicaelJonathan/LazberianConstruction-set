@@ -19,14 +19,56 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Bitfieldio.h" />
+    <ClInclude Include="Classfieldspecs.h" />
+    <ClInclude Include="Classrecordreader.h" />
+    <ClInclude Include="Classrecordwriter.h" />
     <ClInclude Include="DebugConsole.h" />
+    <ClInclude Include="Gametables.h" />
+    <ClInclude Include="Growthfieldspecs.h" />
+    <ClInclude Include="Growthrecordreader.h" />
+    <ClInclude Include="Growthrecordwriter.h" />
+    <ClInclude Include="Isoreader.h" />
+    <ClInclude Include="Itemfieldspecs.h" />
+    <ClInclude Include="Itemiconresolver.h" />
+    <ClInclude Include="Itemrecordreader.h" />
+    <ClInclude Include="Itemrecordwriter.h" />
+    <ClInclude Include="Portraitresolver.h" />
+    <ClInclude Include="Referencetables.h" />
+    <ClInclude Include="Unitdatascanner.h" />
+    <ClInclude Include="Unitfieldspecs.h" />
+    <ClInclude Include="Unitgroupscanner.h" />
+    <ClInclude Include="Unitrecordreader.h" />
+    <ClInclude Include="Unitrecordwriter.h" />
     <ClInclude Include="window.h" />
     <ClInclude Include="windowComponents.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Bitfieldio.cpp" />
+    <ClCompile Include="Classrecordreader.cpp" />
+    <ClCompile Include="Classrecordwriter.cpp" />
     <ClCompile Include="DebugConsole.cpp" />
+    <ClCompile Include="Gameoffsets.h" />
+    <ClCompile Include="Growthrecordreader.cpp" />
+    <ClCompile Include="Growthrecordwriter.cpp" />
+    <ClCompile Include="Isoreader.cpp" />
+    <ClCompile Include="Itemiconresolver.cpp" />
+    <ClCompile Include="Itemrecordreader.cpp" />
+    <ClCompile Include="Itemrecordwriter.cpp" />
+    <ClCompile Include="Portraitresolver.cpp" />
+    <ClCompile Include="Referencetables.cpp" />
+    <ClCompile Include="Unitdatascanner.cpp" />
+    <ClCompile Include="Unitgroupscanner.cpp" />
+    <ClCompile Include="Unitrecordreader.cpp" />
+    <ClCompile Include="Unitrecordwriter.cpp" />
     <ClCompile Include="window.cpp" />
     <ClCompile Include="windowComponents.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\..\Pictures\lcslogo.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\AppIcon.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>
