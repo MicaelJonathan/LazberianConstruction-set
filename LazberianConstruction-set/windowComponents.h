@@ -42,15 +42,15 @@ private:
 
 	enum class UnitStatField { Level, Hp, Strength, Speed, Luck, Defense, Magic, Count };
 	wxSpinCtrl* m_unitStatSpin[static_cast<size_t>(UnitStatField::Count)] = {};
-	wxChoice* m_mainhandChoice = nullptr; 
-	wxChoice* m_offhandChoice = nullptr; 
+	wxChoice* m_mainhandChoice = nullptr;
+	wxChoice* m_offhandChoice = nullptr;
 
 
 	wxSpinCtrl* m_characterIdSpin = nullptr;
 	wxSpinCtrl* m_textIdSpin = nullptr;
 	wxSpinCtrl* m_portraitIdSpin = nullptr;
-	wxChoice* m_unitClassIdChoice = nullptr; 
-	uint16_t m_unitClassChoiceUnknownId = 0; 
+	wxChoice* m_unitClassIdChoice = nullptr;
+	uint16_t m_unitClassChoiceUnknownId = 0;
 
 
 	enum class UnitGrowthStatField { Hp, Str, Def, Spd, Mag, Count };
@@ -73,10 +73,10 @@ private:
 	wxCheckBox* m_inventoryDroppedCheck[UNIT_INVENTORY_SLOT_COUNT] = {};
 
 	wxButton* m_saveUnitButton = nullptr;
-	int m_currentCharacterIndex = -1; 
-	uint16_t m_loadedCharacterId = 0; 
+	int m_currentCharacterIndex = -1;
+	uint16_t m_loadedCharacterId = 0;
 
-// Class Editor
+	// Class Editor
 	wxChoice* m_classChoice = nullptr;
 	int m_currentClassIndex = -1;
 
@@ -98,7 +98,7 @@ private:
 
 	wxButton* m_saveClassButton = nullptr;
 
-// Items Editor
+	// Items Editor
 	wxChoice* m_itemChoice = nullptr;
 	wxStaticBitmap* m_itemIconBitmap = nullptr;
 	wxSpinCtrl* m_itemStatSpin[static_cast<size_t>(ItemNumericField::Count)] = {};
@@ -170,12 +170,16 @@ private:
 	void OnItemChoiceChanged(wxCommandEvent& event);
 	void OnSaveItemClicked(wxCommandEvent& event);
 	void OnEffectRateChoiceChanged(wxCommandEvent& event);
+	void OnExportProject(wxCommandEvent& event);
+	void OnImportProject(wxCommandEvent& event);
 
 	enum {
 		ID_OpenFile = wxID_HIGHEST + 1,
 		ID_ToggleConsole,
 		ID_LangJapanese,
 		ID_LangEnglish,
+		ID_ExportProject,
+		ID_ImportProject,
 	};
 
 };

@@ -16,3 +16,6 @@ bool WriteBitsToFile(const std::string& filePath, uint64_t fileOffset, int xBits
 
 int16_t DecodeSigned5Bits(uint32_t raw);
 uint32_t EncodeSigned5Bits(int16_t value);
+
+int32_t DecodeSignedBits(uint32_t raw, int bitWidth);
+uint32_t EncodeSignedBits(int32_t value, int bitWidth);

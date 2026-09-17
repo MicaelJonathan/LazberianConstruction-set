@@ -71,3 +71,25 @@ uint32_t EncodeSigned5Bits(int16_t value) {
     if (clamped > 15) clamped = 15;
     return static_cast<uint32_t>(clamped) & 0x1Fu;
 }
+
+int32_t DecodeSignedBits(uint32_t raw, int bitWidth) {
+    if (bitWidth <= 0 || bitWidth >= 32) {
+        return static_cast<int32_t>(raw);
+    }
+    uint32_t signBit = 1u << (bitWidth - 1);
+    if (raw & signBit) {
+        return static_cast<int32_t>(raw) - static_cast<int32_t>(1u << bitWidth);
+    }
+    return static_cast<int32_t>(raw);
+}
+
+uint32_t EncodeSignedBits(int32_t value, int bitWidth) {
+    if (bitWidth <= 0 || bitWidth >= 32) {
+        return static_cast<uint32_t>(value);
+    }
+    int32_t minValue = -static_cast<int32_t>(1u << (bitWidth - 1));
+    int32_t maxValue = static_cast<int32_t>((1u << (bitWidth - 1)) - 1);
+    if (value < minValue) value = minValue;
+    if (value > maxValue) value = maxValue;
+    return static_cast<uint32_t>(value) & MaxValueForBits(bitWidth);
+}

@@ -14,7 +14,12 @@ namespace {
         return value;
     }
 
-    uint32_t GetFieldValue(const ItemStats& stats, ItemNumericField field) {
+    bool IsUnsignedField(ItemNumericField field) {
+        return field == ItemNumericField::Uses || field == ItemNumericField::Level
+            || field == ItemNumericField::Might || field == ItemNumericField::Accuracy;
+    }
+
+    int32_t GetFieldValue(const ItemStats& stats, ItemNumericField field) {
         switch (field) {
         case ItemNumericField::Might: return stats.might;
         case ItemNumericField::Hex: return stats.hexValue;
@@ -65,9 +70,22 @@ bool WriteItemStats(const std::string& isoPath, uint64_t dataOffset, int languag
 
     for (uint64_t fileBase : bases) {
         for (const auto& spec : ItemFieldSpecs) {
-            uint32_t maxAllowed = (spec.maxValueOverride != 0) ? spec.maxValueOverride : MaxValueForBits(spec.bitWidth);
-            uint32_t clamped = Clamp(GetFieldValue(stats, spec.field), spec.minValue, maxAllowed);
-            write(fileBase + spec.byteOffset, spec.bitWidth, spec.bitOffset, clamped);
+            int32_t rawValue = GetFieldValue(stats, spec.field);
+
+            if (IsUnsignedField(spec.field)) {
+                // Uses/Level (piso minimo) e Might/Accuracy/Hit (nao suportam negativo) ficam sem sinal.
+                uint32_t maxAllowed = (spec.maxValueOverride != 0) ? spec.maxValueOverride : MaxValueForBits(spec.bitWidth);
+                uint32_t clamped = Clamp(static_cast<uint32_t>(rawValue), spec.minValue, maxAllowed);
+                write(fileBase + spec.byteOffset, spec.bitWidth, spec.bitOffset, clamped);
+            }
+            else {
+                int32_t naturalMin = -static_cast<int32_t>(1u << (spec.bitWidth - 1));
+                int32_t naturalMax = static_cast<int32_t>((1u << (spec.bitWidth - 1)) - 1);
+                int32_t effectiveMax = (spec.maxValueOverride != 0) ? static_cast<int32_t>(spec.maxValueOverride) : naturalMax;
+                if (rawValue < naturalMin) rawValue = naturalMin;
+                if (rawValue > effectiveMax) rawValue = effectiveMax;
+                write(fileBase + spec.byteOffset, spec.bitWidth, spec.bitOffset, EncodeSignedBits(rawValue, spec.bitWidth));
+            }
         }
 
         uint32_t durability = Clamp(stats.durabilityIndex, 0, ITEM_DURABILITY_MAX);

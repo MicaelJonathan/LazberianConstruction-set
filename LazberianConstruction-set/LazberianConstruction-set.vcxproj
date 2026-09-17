@@ -33,6 +33,7 @@
     <ClInclude Include="Itemiconresolver.h" />
     <ClInclude Include="Itemrecordreader.h" />
     <ClInclude Include="Itemrecordwriter.h" />
+    <ClInclude Include="Lepproject.h" />
     <ClInclude Include="Portraitresolver.h" />
     <ClInclude Include="Referencetables.h" />
     <ClInclude Include="Unitdatascanner.h" />
@@ -55,6 +56,7 @@
     <ClCompile Include="Itemiconresolver.cpp" />
     <ClCompile Include="Itemrecordreader.cpp" />
     <ClCompile Include="Itemrecordwriter.cpp" />
+    <ClCompile Include="Lepproject.cpp" />
     <ClCompile Include="Portraitresolver.cpp" />
     <ClCompile Include="Referencetables.cpp" />
     <ClCompile Include="Unitdatascanner.cpp" />

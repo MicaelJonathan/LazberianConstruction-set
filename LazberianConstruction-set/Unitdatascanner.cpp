@@ -160,3 +160,37 @@ std::vector<UnitDataEntry> LoadUnitDataRefSheet(const std::string& path) {
 
     return entries;
 }
+
+std::unordered_map<std::string, std::string> LoadUnitDataNameRef(const std::string& path) {
+    std::unordered_map<std::string, std::string> nameRef;
+
+    std::ifstream file(path);
+    if (!file.is_open()) {
+        return nameRef;
+    }
+
+    auto trim = [](std::string& s) {
+        size_t start = s.find_first_not_of(" \t\r\n");
+        size_t end = s.find_last_not_of(" \t\r\n");
+        s = (start == std::string::npos) ? "" : s.substr(start, end - start + 1);
+        };
+
+    std::string line;
+    while (std::getline(file, line)) {
+        size_t eqPos = line.find('=');
+        if (eqPos == std::string::npos) {
+            continue;
+        }
+
+        std::string name = line.substr(0, eqPos);
+        std::string displayName = line.substr(eqPos + 1);
+        trim(name);
+        trim(displayName);
+
+        if (!name.empty()) {
+            nameRef[name] = displayName;
+        }
+    }
+
+    return nameRef;
+}

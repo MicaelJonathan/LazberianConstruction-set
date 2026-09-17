@@ -16,6 +16,7 @@
 #include "ItemRecordReader.h"
 #include "ItemRecordWriter.h"
 #include "BitFieldIO.h"
+#include "LepProject.h"
 
 #include <wx/filedlg.h>
 #include <wx/image.h>
@@ -46,6 +47,8 @@ MainFrame::MainFrame() : wxFrame(nullptr, wxID_ANY, "Lazberian Construction Set 
 	Bind(wxEVT_MENU, &MainFrame::OnToggleConsole, this, ID_ToggleConsole);
 	Bind(wxEVT_MENU, &MainFrame::OnLanguageChanged, this, ID_LangJapanese);
 	Bind(wxEVT_MENU, &MainFrame::OnLanguageChanged, this, ID_LangEnglish);
+	Bind(wxEVT_MENU, &MainFrame::OnExportProject, this, ID_ExportProject);
+	Bind(wxEVT_MENU, &MainFrame::OnImportProject, this, ID_ImportProject);
 
 	Center();
 }
@@ -53,6 +56,9 @@ MainFrame::MainFrame() : wxFrame(nullptr, wxID_ANY, "Lazberian Construction Set 
 void MainFrame::CreateMenuBar() {
 	wxMenu* menuFile = new wxMenu();
 	menuFile->Append(ID_OpenFile, "&Open\tCtrl+O", "Open an ISO file");
+	menuFile->AppendSeparator();
+	menuFile->Append(ID_ExportProject, "&Export Project (.lep)...", "Export unit, class, item and growth data to a .lep file");
+	menuFile->Append(ID_ImportProject, "&Import Project (.lep)...", "Import a .lep file and write it directly to the loaded ISO");
 	menuFile->AppendSeparator();
 	menuFile->Append(wxID_EXIT);
 
@@ -405,11 +411,24 @@ wxPanel* MainFrame::CreateItemsDataPanel(wxWindow* parent) {
 		for (const auto& s : ItemFieldSpecs) {
 			if (s.field == field) { spec = &s; break; }
 		}
-		uint32_t maxAllowed = (spec->maxValueOverride != 0) ? spec->maxValueOverride : MaxValueForBits(spec->bitWidth);
+
+		bool isUnsignedField = (field == ItemNumericField::Uses || field == ItemNumericField::Level
+			|| field == ItemNumericField::Might || field == ItemNumericField::Accuracy);
+
+		int minAllowed;
+		int maxAllowed;
+		if (isUnsignedField) {
+			minAllowed = static_cast<int>(spec->minValue);
+			maxAllowed = static_cast<int>((spec->maxValueOverride != 0) ? spec->maxValueOverride : MaxValueForBits(spec->bitWidth));
+		}
+		else {
+			minAllowed = -static_cast<int>(1u << (spec->bitWidth - 1));
+			maxAllowed = (spec->maxValueOverride != 0) ? static_cast<int>(spec->maxValueOverride) : static_cast<int>((1u << (spec->bitWidth - 1)) - 1);
+		}
 
 		statsGrid->Add(new wxStaticText(panel, wxID_ANY, labelText));
 		wxSpinCtrl* spin = new wxSpinCtrl(panel, wxID_ANY, "0", wxDefaultPosition, wxSize(70, -1),
-			wxSP_ARROW_KEYS, static_cast<int>(spec->minValue), static_cast<int>(maxAllowed));
+			wxSP_ARROW_KEYS, minAllowed, maxAllowed);
 		m_itemStatSpin[static_cast<size_t>(field)] = spin;
 		statsGrid->Add(spin);
 		};
@@ -742,8 +761,14 @@ void MainFrame::PopulateUnitDataTree() {
 		return;
 	}
 
+	std::unordered_map<std::string, std::string> nameRef = LoadUnitDataNameRef();
+
 	for (const auto& entry : entries) {
-		wxTreeItemId item = m_tree->AppendItem(root, entry.name);
+		auto it = nameRef.find(entry.name);
+		wxString displayName = (it != nameRef.end()) ? wxString(it->second) : wxString("(unknown)");
+		wxString itemText = wxString::Format("%s = %s", entry.name, displayName);
+
+		wxTreeItemId item = m_tree->AppendItem(root, itemText);
 		m_tree->SetItemData(item, new UnitDataTreeItemData(entry.address));
 	}
 }
@@ -1065,28 +1090,28 @@ void MainFrame::SaveCurrentItem() {
 		};
 
 	stats.might = static_cast<uint16_t>(getSpin(ItemNumericField::Might));
-	stats.hexValue = static_cast<uint16_t>(getSpin(ItemNumericField::Hex));
+	stats.hexValue = getSpin(ItemNumericField::Hex);
 	stats.accuracy = static_cast<uint16_t>(getSpin(ItemNumericField::Accuracy));
-	stats.weight = static_cast<uint16_t>(getSpin(ItemNumericField::Weight));
-	stats.maxRange = static_cast<uint16_t>(getSpin(ItemNumericField::MaxRange));
-	stats.minRange = static_cast<uint16_t>(getSpin(ItemNumericField::MinRange));
-	stats.crit = static_cast<uint16_t>(getSpin(ItemNumericField::Crit));
+	stats.weight = getSpin(ItemNumericField::Weight);
+	stats.maxRange = getSpin(ItemNumericField::MaxRange);
+	stats.minRange = getSpin(ItemNumericField::MinRange);
+	stats.crit = getSpin(ItemNumericField::Crit);
 	stats.uses = static_cast<uint16_t>(getSpin(ItemNumericField::Uses));
 	stats.level = static_cast<uint16_t>(getSpin(ItemNumericField::Level));
-	stats.price = static_cast<uint32_t>(getSpin(ItemNumericField::Price));
-	stats.defense = static_cast<uint16_t>(getSpin(ItemNumericField::Defense));
-	stats.speed = static_cast<uint16_t>(getSpin(ItemNumericField::Speed));
-	stats.avoid = static_cast<uint16_t>(getSpin(ItemNumericField::Avoid));
-	stats.hit = static_cast<uint16_t>(getSpin(ItemNumericField::Hit));
-	stats.magic = static_cast<uint16_t>(getSpin(ItemNumericField::Magic));
-	stats.strength = static_cast<uint16_t>(getSpin(ItemNumericField::Strength));
-	stats.rounds = static_cast<uint16_t>(getSpin(ItemNumericField::Rounds));
-	stats.fireRes = static_cast<uint16_t>(getSpin(ItemNumericField::FireRes));
-	stats.thunderRes = static_cast<uint16_t>(getSpin(ItemNumericField::ThunderRes));
-	stats.windRes = static_cast<uint16_t>(getSpin(ItemNumericField::WindRes));
-	stats.darkRes = static_cast<uint16_t>(getSpin(ItemNumericField::DarkRes));
-	stats.holyRes = static_cast<uint16_t>(getSpin(ItemNumericField::HolyRes));
-	stats.critAvoidPenalty = static_cast<uint16_t>(getSpin(ItemNumericField::CritAvoidPenalty));
+	stats.price = getSpin(ItemNumericField::Price);
+	stats.defense = getSpin(ItemNumericField::Defense);
+	stats.speed = getSpin(ItemNumericField::Speed);
+	stats.avoid = getSpin(ItemNumericField::Avoid);
+	stats.hit = getSpin(ItemNumericField::Hit);
+	stats.magic = getSpin(ItemNumericField::Magic);
+	stats.strength = getSpin(ItemNumericField::Strength);
+	stats.rounds = getSpin(ItemNumericField::Rounds);
+	stats.fireRes = getSpin(ItemNumericField::FireRes);
+	stats.thunderRes = getSpin(ItemNumericField::ThunderRes);
+	stats.windRes = getSpin(ItemNumericField::WindRes);
+	stats.darkRes = getSpin(ItemNumericField::DarkRes);
+	stats.holyRes = getSpin(ItemNumericField::HolyRes);
+	stats.critAvoidPenalty = getSpin(ItemNumericField::CritAvoidPenalty);
 
 	stats.durabilityIndex = static_cast<uint16_t>(m_durabilityChoice->GetSelection());
 
@@ -1112,8 +1137,6 @@ void MainFrame::SaveCurrentItem() {
 			"ERROR SAVING!!!", wxOK | wxICON_ERROR, this);
 	}
 
-	// Recarrega diretamente do disco para confirmar visualmente que a
-	// gravacao persistiu exatamente como esperado.
 	LoadItemIntoPanel(m_currentItemIndex);
 }
 
@@ -1277,5 +1300,74 @@ void MainFrame::OnEffectRateChoiceChanged(wxCommandEvent& WXUNUSED(event)) {
 	m_effectRateValueSpin->Enable(!isNone);
 	if (isNone) {
 		m_effectRateValueSpin->SetValue(0);
+	}
+}
+
+void MainFrame::OnExportProject(wxCommandEvent& WXUNUSED(event)) {
+	if (m_isoPath.IsEmpty()) {
+		wxMessageBox("Load an ISO first.", "No ISO loaded", wxOK | wxICON_WARNING, this);
+		return;
+	}
+
+	wxFileDialog saveDialog(this, "Export Project", "", "",
+		"Lazberian Export Project (*.lep)|*.lep",
+		wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+	if (saveDialog.ShowModal() == wxID_CANCEL) {
+		return;
+	}
+
+	SetStatusText("Exporting project...");
+	bool ok = ExportLepProject(saveDialog.GetPath().ToStdString(), m_isoPath.ToStdString(), m_dataOffset, m_dataSize,
+		m_languageUsed, m_referenceTables);
+
+	if (ok) {
+		SetStatusText("Project exported successfully.");
+	}
+	else {
+		SetStatusText("Failed to export project - open debug console and try again for error log.");
+		wxMessageBox("Could not export the project.\nOpen the debug console (F7) for details and try again for error log.",
+			"Error exporting project", wxOK | wxICON_ERROR, this);
+	}
+}
+
+void MainFrame::OnImportProject(wxCommandEvent& WXUNUSED(event)) {
+	if (m_isoPath.IsEmpty()) {
+		wxMessageBox("Load an ISO first.", "No ISO loaded", wxOK | wxICON_WARNING, this);
+		return;
+	}
+
+	wxFileDialog openDialog(this, "Import Project", "", "",
+		"Lazberian Export Project (*.lep)|*.lep",
+		wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+	if (openDialog.ShowModal() == wxID_CANCEL) {
+		return;
+	}
+
+	int confirm = wxMessageBox("Importing will overwrite unit, class, item and growth data directly on the loaded ISO.\nThis cannot be undone. Continue?",
+		"Confirm import", wxYES_NO | wxICON_WARNING, this);
+	if (confirm != wxYES) {
+		return;
+	}
+
+	SetStatusText("Importing project...");
+	bool ok = ImportLepProject(openDialog.GetPath().ToStdString(), m_isoPath.ToStdString(), m_dataOffset, m_dataSize);
+
+	if (ok) {
+		SetStatusText("Project imported successfully.");
+	}
+	else {
+		SetStatusText("Failed to import project - open debug console and try again for error log.");
+		wxMessageBox("Could not import all of the project.\nOpen the debug console (F7) for details and try again for error log.",
+			"Error importing project", wxOK | wxICON_ERROR, this);
+	}
+
+	if (m_currentCharacterIndex >= 0) {
+		LoadCharacterIntoPanel(static_cast<size_t>(m_currentCharacterIndex));
+	}
+	if (m_currentClassIndex >= 0) {
+		LoadClassIntoPanel(m_currentClassIndex);
+	}
+	if (m_currentItemIndex >= 0) {
+		LoadItemIntoPanel(m_currentItemIndex);
 	}
 }

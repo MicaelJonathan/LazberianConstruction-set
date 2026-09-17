@@ -9,7 +9,7 @@ inline const std::vector<std::string> ItemEffects = {
     "2x cripple", "Use numerical durability", "Can't counter (lance effect)", "Can't move", "--", "--", "Chance def UP", "Defend adjutant",
     "Gigas Kight lock", "Nosferatu effect", "Damage EXP", "General lock", "Infantry type only", "--", "Lock to user", "--",
     "Unbreakable", "Quest item", "--", "--", "--", "??", "Unobtainable dagger", "Unobtainable arrow",
-    "Unobtainable mace", "money", "--", "Hide", "Overwatch", "Parry", "--", "--", "--", "--",
+    "Unobtainable mace", "Money", "--", "Hide", "Overwatch", "Parry", "--", "--", "--", "--",
     "Vitria effect", "??", "--", "??", "Can't kill", "--", "Add level to damage", "Scorpio buff effect (?)",
     "0 range throwable", "--", "--", "Goes to broken", "Horse", "Famed horse", "1+ move", "--", "--", "Paladin lock",
     "Star icon", "--", "Assassin lock", "Aiantos effect", "--", "--", "--", "--", "--", "Blackrider lock",

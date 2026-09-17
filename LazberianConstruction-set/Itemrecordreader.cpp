@@ -1,5 +1,6 @@
 #include "ItemRecordReader.h"
 #include "GameTables.h"
+#include "BitFieldIO.h"
 
 #include <fstream>
 #include <vector>
@@ -33,32 +34,32 @@ ItemStats ReadItemStats(const std::string& isoPath, uint64_t dataOffset, uint64_
     }
 
     stats.might = static_cast<uint16_t>(ReadBits(buffer.data() + 0, 6, 5));
-    stats.hexValue = static_cast<uint16_t>(ReadBits(buffer.data() + 1, 4, 3));
+    stats.hexValue = DecodeSignedBits(ReadBits(buffer.data() + 1, 4, 3), 4);
     stats.accuracy = static_cast<uint16_t>(ReadBits(buffer.data() + 1, 7, 7));
-    stats.weight = static_cast<uint16_t>(ReadBits(buffer.data() + 2, 5, 6));
-    stats.maxRange = static_cast<uint16_t>(ReadBits(buffer.data() + 3, 5, 3));
-    stats.minRange = static_cast<uint16_t>(ReadBits(buffer.data() + 4, 4, 0));
-    stats.crit = static_cast<uint16_t>(ReadBits(buffer.data() + 5, 7, 0));
+    stats.weight = DecodeSignedBits(ReadBits(buffer.data() + 2, 5, 6), 5);
+    stats.maxRange = DecodeSignedBits(ReadBits(buffer.data() + 3, 5, 3), 5);
+    stats.minRange = DecodeSignedBits(ReadBits(buffer.data() + 4, 4, 0), 4);
+    stats.crit = DecodeSignedBits(ReadBits(buffer.data() + 5, 7, 0), 7);
     stats.uses = static_cast<uint16_t>(ReadBits(buffer.data() + 5, 7, 7));
     stats.level = static_cast<uint16_t>(ReadBits(buffer.data() + 6, 6, 6));
-    stats.price = ReadBits(buffer.data() + 8, 16, 0);
+    stats.price = DecodeSignedBits(ReadBits(buffer.data() + 8, 16, 0), 16);
 
-    stats.defense = static_cast<uint16_t>(ReadBits(buffer.data() + 12, 6, 0));
-    stats.speed = static_cast<uint16_t>(ReadBits(buffer.data() + 13, 5, 3));
-    stats.avoid = static_cast<uint16_t>(ReadBits(buffer.data() + 14, 8, 0));
-    stats.hit = static_cast<uint16_t>(ReadBits(buffer.data() + 15, 8, 0));
-    stats.magic = static_cast<uint16_t>(ReadBits(buffer.data() + 16, 5, 0));
-    stats.strength = static_cast<uint16_t>(ReadBits(buffer.data() + 16, 5, 5));
-    stats.rounds = static_cast<uint16_t>(ReadBits(buffer.data() + 17, 4, 2));
+    stats.defense = DecodeSignedBits(ReadBits(buffer.data() + 12, 6, 0), 6);
+    stats.speed = DecodeSignedBits(ReadBits(buffer.data() + 13, 5, 3), 5);
+    stats.avoid = DecodeSignedBits(ReadBits(buffer.data() + 14, 8, 0), 8);
+    stats.hit = DecodeSignedBits(ReadBits(buffer.data() + 15, 8, 0), 8);
+    stats.magic = DecodeSignedBits(ReadBits(buffer.data() + 16, 5, 0), 5);
+    stats.strength = DecodeSignedBits(ReadBits(buffer.data() + 16, 5, 5), 5);
+    stats.rounds = DecodeSignedBits(ReadBits(buffer.data() + 17, 4, 2), 4);
 
-    stats.fireRes = static_cast<uint16_t>(ReadBits(buffer.data() + 17, 6, 6));
-    stats.thunderRes = static_cast<uint16_t>(ReadBits(buffer.data() + 18, 6, 4));
-    stats.windRes = static_cast<uint16_t>(ReadBits(buffer.data() + 19, 6, 2));
-    stats.darkRes = static_cast<uint16_t>(ReadBits(buffer.data() + 20, 6, 0));
-    stats.holyRes = static_cast<uint16_t>(ReadBits(buffer.data() + 20, 6, 6));
+    stats.fireRes = DecodeSignedBits(ReadBits(buffer.data() + 17, 6, 6), 6);
+    stats.thunderRes = DecodeSignedBits(ReadBits(buffer.data() + 18, 6, 4), 6);
+    stats.windRes = DecodeSignedBits(ReadBits(buffer.data() + 19, 6, 2), 6);
+    stats.darkRes = DecodeSignedBits(ReadBits(buffer.data() + 20, 6, 0), 6);
+    stats.holyRes = DecodeSignedBits(ReadBits(buffer.data() + 20, 6, 6), 6);
 
     stats.durabilityIndex = static_cast<uint16_t>(ReadBits(buffer.data() + 21, 3, 4));
-    stats.critAvoidPenalty = static_cast<uint16_t>(ReadBits(buffer.data() + 21, 8, 7));
+    stats.critAvoidPenalty = DecodeSignedBits(ReadBits(buffer.data() + 21, 8, 7), 8);
 
     stats.effectRateValue = static_cast<uint16_t>(ReadBits(buffer.data() + 26, 7, 0));
     uint16_t rawEffectRateId = static_cast<uint16_t>(ReadBits(buffer.data() + 27, 8, 0));

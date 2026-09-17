@@ -84,6 +84,9 @@
     <ClInclude Include="Classrecordwriter.h">
       <Filter>Arquivos de Recurso</Filter>
     </ClInclude>
+    <ClInclude Include="Lepproject.h">
+      <Filter>Arquivos de Recurso</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="window.cpp">
@@ -141,6 +144,9 @@
       <Filter>Arquivos de Recurso</Filter>
     </ClCompile>
     <ClCompile Include="Classrecordwriter.cpp">
+      <Filter>Arquivos de Recurso</Filter>
+    </ClCompile>
+    <ClCompile Include="Lepproject.cpp">
       <Filter>Arquivos de Recurso</Filter>
     </ClCompile>
   </ItemGroup>
